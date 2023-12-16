@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Insurance Premium Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            margin-bottom: 10px;
+        }
+
+        #result {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Health Insurance Premium Calculator</h1>
+
+<form id="insuranceForm">
+    <label for="age">Enter your age:</label>
+    <input type="number" id="age" required>
+
+    <label for="gender">Enter your gender (Male/Female):</label>
+    <input type="text" id="gender" required>
+
+    <label for="coverageType">Enter coverage type (Basic/Comprehensive):</label>
+    <input type="text" id="coverageType" required>
+
+    <div id="healthConditions">
+        <p>Enter 'True' if you have the following conditions; otherwise, enter 'False'.</p>
+    </div>
+
+    <button type="button" onclick="calculatePremium()">Calculate Premium</button>
+
+    <p id="result"></p>
+</form>
+
+<script>
+    function createHealthConditionInput(condition) {
+        const label = document.createElement("label");
+        label.textContent = `Do you have ${condition.replace('_', ' ')}?`;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = condition;
+        input.required = true;
+
+        const healthConditionsDiv = document.getElementById("healthConditions");
+        healthConditionsDiv.appendChild(label);
+        healthConditionsDiv.appendChild(input);
+    }
+
+    function calculatePremium() {
+        const age = parseFloat(document.getElementById("age").value);
+        const gender = document.getElementById("gender").value.toLowerCase();
+        const coverageType = document.getElementById("coverageType").value.toLowerCase();
+        const healthConditions = {};
+
+        const conditions = ['diabetes', 'cancer', 'smoker', 'alcohol_consumer', 'hereditary_problem',
+            'heart_patient', 'asthma', 'thyroid', 'tb', 'anaemic'];
+
+        conditions.forEach(condition => {
+            const input = document.getElementById(condition);
+            healthConditions[condition] = input ? input.value.toLowerCase() === 'true' : false;
+        });
+
+        const basePremium = calculateBasePremium(age, gender);
+        const coveragePremium = calculateCoveragePremium(coverageType);
+        const additionalPremium = calculateAdditionalPremium(healthConditions);
+
+        const totalPremium = basePremium + coveragePremium + additionalPremium;
+
+        const resultElement = document.getElementById("result");
+        resultElement.textContent = `The health insurance premium is ${totalPremium} rupees per month.`;
+    }
+
+    function calculateBasePremium(age, gender) {
+        const genderFactor = gender === 'male' ? 1.2 : 1.1;
+        return 1000 * age * genderFactor;
+    }
+
+    function calculateCoveragePremium(coverageType) {
+        return coverageType === 'basic' ? 0.05 * 1000 : coverageType === 'comprehensive' ? 0.1 * 1000 : 0;
+    }
+
+    function calculateAdditionalPremium(healthConditions) {
+        let additionalPremium = 0;
+
+        for (const condition in healthConditions) {
+            if (healthConditions.hasOwnProperty(condition) && healthConditions[condition]) {
+                const conditionFactors = {
+                    'diabetes': 0.2,
+                    'cancer': 0.3,
+                    'smoker': 0.15,
+                    'alcohol_consumer': 0.1,
+                    'hereditary_problem': 0.25,
+                    'heart_patient': 0.3,
+                    'asthma': 0.2,
+                    'thyroid': 0.15,
+                    'tb': 0.25,
+                    'anaemic': 0.1
+                };
+                additionalPremium += conditionFactors[condition] * 1000;
+            }
+        }
+
+        return additionalPremium;
+    }
+
+    // Create health condition input fields dynamically
+    const conditions = ['diabetes', 'cancer', 'smoker', 'alcohol_consumer', 'hereditary_problem',
+        'heart_patient', 'asthma', 'thyroid', 'tb', 'anaemic'];
+
+    conditions.forEach(condition => createHealthConditionInput(condition));
+</script>
+
+</body>
+</html>
