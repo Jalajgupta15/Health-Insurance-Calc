@@ -7,122 +7,137 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-        }
-
-        input {
             margin-bottom: 10px;
+            font-weight: bold;
         }
 
-        #result {
-            font-weight: bold;
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border: 1px solid #99c2ff;
+            border-radius: 4px;
+            display: none;
+        }
+
+        #output h2 {
+            color: #0073e6;
         }
     </style>
 </head>
 <body>
 
-<h1>Health Insurance Premium Calculator</h1>
+<div class="container">
+    <h1>Health Insurance Premium Calculator</h1>
 
-<form id="insuranceForm">
-    <label for="age">Enter your age:</label>
-    <input type="number" id="age" required>
+    <form id="insuranceForm">
+        <label for="age">Enter your age:</label>
+        <input type="number" id="age" name="age" required>
 
-    <label for="gender">Enter your gender (Male/Female):</label>
-    <input type="text" id="gender" required>
+        <label for="gender">Select your gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
 
-    <label for="coverageType">Enter coverage type (Basic/Comprehensive):</label>
-    <input type="text" id="coverageType" required>
+        <label for="coverageType">Select coverage type:</label>
+        <select id="coverageType" name="coverageType" required>
+            <option value="basic">Basic</option>
+            <option value="comprehensive">Comprehensive</option>
+        </select>
 
-    <div id="healthConditions">
-        <p>Enter 'True' if you have the following conditions; otherwise, enter 'False'.</p>
+        <fieldset>
+            <legend>Health Conditions:</legend>
+
+            <div>
+                <label><input type="checkbox" name="diabetes"> Diabetes</label>
+                <label><input type="checkbox" name="cancer"> Cancer</label>
+                <label><input type="checkbox" name="smoker"> Smoker</label>
+                <label><input type="checkbox" name="alcoholConsumer"> Alcohol Consumer</label>
+                <label><input type="checkbox" name="hereditaryProblem"> Hereditary Problem</label>
+                <label><input type="checkbox" name="heartPatient"> Heart Patient</label>
+                <label><input type="checkbox" name="asthma"> Asthma</label>
+                <label><input type="checkbox" name="thyroid"> Thyroid</label>
+                <label><input type="checkbox" name="tb"> Tuberculosis (TB)</label>
+                <label><input type="checkbox" name="anaemic"> Anaemic</label>
+            </div>
+        </fieldset>
+
+        <button type="button" onclick="calculatePremium()">Calculate Premium</button>
+    </form>
+
+    <div id="output">
+        <h2>Health Insurance Premium</h2>
+        <p id="premiumResult"></p>
     </div>
-
-    <button type="button" onclick="calculatePremium()">Calculate Premium</button>
-
-    <p id="result"></p>
-</form>
+</div>
 
 <script>
-    function createHealthConditionInput(condition) {
-        const label = document.createElement("label");
-        label.textContent = `Do you have ${condition.replace('_', ' ')}?`;
-        const input = document.createElement("input");
-        input.type = "text";
-        input.id = condition;
-        input.required = true;
-
-        const healthConditionsDiv = document.getElementById("healthConditions");
-        healthConditionsDiv.appendChild(label);
-        healthConditionsDiv.appendChild(input);
-    }
-
     function calculatePremium() {
-        const age = parseFloat(document.getElementById("age").value);
-        const gender = document.getElementById("gender").value.toLowerCase();
-        const coverageType = document.getElementById("coverageType").value.toLowerCase();
-        const healthConditions = {};
+        var age = document.getElementById("age").value;
+        var gender = document.getElementById("gender").value;
+        var coverageType = document.getElementById("coverageType").value;
 
-        const conditions = ['diabetes', 'cancer', 'smoker', 'alcohol_consumer', 'hereditary_problem',
-            'heart_patient', 'asthma', 'thyroid', 'tb', 'anaemic'];
+        var healthConditions = {
+            diabetes: document.getElementsByName("diabetes")[0].checked,
+            cancer: document.getElementsByName("cancer")[0].checked,
+            smoker: document.getElementsByName("smoker")[0].checked,
+            alcoholConsumer: document.getElementsByName("alcoholConsumer")[0].checked,
+            hereditaryProblem: document.getElementsByName("hereditaryProblem")[0].checked,
+            heartPatient: document.getElementsByName("heartPatient")[0].checked,
+            asthma: document.getElementsByName("asthma")[0].checked,
+            thyroid: document.getElementsByName("thyroid")[0].checked,
+            tb: document.getElementsByName("tb")[0].checked,
+            anaemic: document.getElementsByName("anaemic")[0].checked,
+        };
 
-        conditions.forEach(condition => {
-            const input = document.getElementById(condition);
-            healthConditions[condition] = input ? input.value.toLowerCase() === 'true' : false;
-        });
+        // Mocking the output as the calculation logic is in Python
+        var premium = 1500; // Replace with the actual premium calculated in Python
 
-        const basePremium = calculateBasePremium(age, gender);
-        const coveragePremium = calculateCoveragePremium(coverageType);
-        const additionalPremium = calculateAdditionalPremium(healthConditions);
-
-        const totalPremium = basePremium + coveragePremium + additionalPremium;
-
-        const resultElement = document.getElementById("result");
-        resultElement.textContent = `The health insurance premium is ${totalPremium} rupees per month.`;
+        document.getElementById("premiumResult").innerHTML = "The health insurance premium is " + premium + " rupees per month.";
+        document.getElementById("output").style.display = "block";
     }
-
-    function calculateBasePremium(age, gender) {
-        const genderFactor = gender === 'male' ? 1.2 : 1.1;
-        return 1000 * age * genderFactor;
-    }
-
-    function calculateCoveragePremium(coverageType) {
-        return coverageType === 'basic' ? 0.05 * 1000 : coverageType === 'comprehensive' ? 0.1 * 1000 : 0;
-    }
-
-    function calculateAdditionalPremium(healthConditions) {
-        let additionalPremium = 0;
-
-        for (const condition in healthConditions) {
-            if (healthConditions.hasOwnProperty(condition) && healthConditions[condition]) {
-                const conditionFactors = {
-                    'diabetes': 0.2,
-                    'cancer': 0.3,
-                    'smoker': 0.15,
-                    'alcohol_consumer': 0.1,
-                    'hereditary_problem': 0.25,
-                    'heart_patient': 0.3,
-                    'asthma': 0.2,
-                    'thyroid': 0.15,
-                    'tb': 0.25,
-                    'anaemic': 0.1
-                };
-                additionalPremium += conditionFactors[condition] * 1000;
-            }
-        }
-
-        return additionalPremium;
-    }
-
-    // Create health condition input fields dynamically
-    const conditions = ['diabetes', 'cancer', 'smoker', 'alcohol_consumer', 'hereditary_problem',
-        'heart_patient', 'asthma', 'thyroid', 'tb', 'anaemic'];
-
-    conditions.forEach(condition => createHealthConditionInput(condition));
 </script>
 
 </body>
